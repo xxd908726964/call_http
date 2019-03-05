@@ -19,6 +19,7 @@ struct http_res_
 {
 	char* http_hander;//http头部分
 	char* http_data;//http数据部分
+	int http_data_len;
 }http_res;
 
 typedef int (*__io)(char* buf, int num);

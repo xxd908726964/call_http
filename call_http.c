@@ -133,25 +133,27 @@ int reqest( char* req) {
 	memset(http_res.http_hander, 0, http_hander_size);
 	char* http_hander_temp = http_res.http_hander;
 	int _r_n_count = 0;
-	for (int i = 0; i < 100;i++) {
+	for (int i = 0; i <= 100;i++) {
 		myread(http_hander_temp, 1);
 		if (*http_hander_temp == '\r' || *http_hander_temp == '\n')
 			_r_n_count++;
+			else _r_n_count = 0;
 		if (4 == _r_n_count) {
 
 			_r_n_count = 0;
 			break;
 		}
-		if (99 == i && 4 != _r_n_count) {
+		if (100 == i && 4 != _r_n_count) {
 			http_hander_size += 100;
 			if (!realloc(http_res.http_hander, sizeof(char) * http_hander_size))return -1;;
 			http_hander_temp = http_res.http_hander + http_hander_size-100;
 			i = 0;
 		}
 		http_hander_temp++;
-		fprintf(stderr,"%c", *http_hander_temp);
+		
+		//fprintf(stderr,"%c", *http_hander_temp);
 	}
-	printf("%s\n", http_res.http_hander);
+	//printf("%s\n", http_res.http_hander);
 	regex_t reg;
 	regmatch_t reg_mat[2]; 
 	int a;
@@ -171,14 +173,23 @@ int reqest( char* req) {
 	char http_leng[20] = { '\0' };
 	memcpy(http_leng, http_res.http_hander + reg_mat[1].rm_so, reg_mat[1].rm_eo - reg_mat[1].rm_so);
 	int http_data_leng=atoi(http_leng);
-	http_res.http_data = malloc(http_data_leng);
+	http_res.http_data_len=http_data_leng;
+	http_res.http_data = malloc(http_data_leng+10);
 	char* http_data_temp = http_res.http_data;
+	memset(http_res.http_data,0,http_data_leng+10);
 	int re = 0;
+		FILE *f;
+	f=fopen("aaa.txt","w");
 	while (1) {
-		re+=myread(http_res.http_data, 100);
+		re=myread(http_data_temp, 100);
+			fwrite(http_data_temp,re,1,f);
 		http_data_temp += re;
-		if (http_data_leng == re)break;
+		
+		if (http_data_leng == re||re==0)break;
 	}
+
+
+	fclose(f);
 	regfree(&reg);
 	return 0;
 }
